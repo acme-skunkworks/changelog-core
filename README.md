@@ -33,6 +33,7 @@ Required identity keys: `issueKeys`, `linearWorkspaceSlug`. Structural keys
 
 ```bash
 npx changelog-core [--config <path>] <subcommand> [args…]
+npx changelog-core --version
 ```
 
 | Subcommand              | Purpose                                                           |

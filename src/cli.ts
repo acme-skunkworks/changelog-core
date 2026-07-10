@@ -11,7 +11,12 @@ import { main as enrichMain } from "./commands/enrich.js";
 import { main as finaliseMain } from "./commands/finalise.js";
 import { main as setAffectedPackagesMain } from "./commands/set-affected-packages.js";
 import { main as validateMain } from "./commands/validate.js";
+import { createRequire } from "node:module";
 import { argv, exit } from "node:process";
+
+const { version: PACKAGE_VERSION } = createRequire(import.meta.url)(
+  "../package.json",
+) as { version: string };
 
 const SUBCOMMANDS = [
   "validate",
@@ -51,7 +56,8 @@ Subcommands:
 
 Global options:
   --config <path>          Path to config.json (also via CHANGELOG_CONFIG)
-  --help, -h               Show this message`;
+  --help, -h               Show this message
+  --version, -V            Print the package version`;
 
 function extractConfig(args: string[]): {
   configPath: string | undefined;
@@ -95,6 +101,11 @@ function main(): void {
 
   if (rest.length === 0 || rest[0] === "--help" || rest[0] === "-h") {
     console.log(USAGE);
+    return;
+  }
+
+  if (rest[0] === "--version" || rest[0] === "-V") {
+    console.log(PACKAGE_VERSION);
     return;
   }
 
