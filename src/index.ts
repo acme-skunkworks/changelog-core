@@ -4,7 +4,7 @@
  * Library helpers and command pure functions — the CLI lives in `cli.ts`.
  */
 
-// --- commands ---------------------------------------------------------------
+// --- commands (pure helpers) ------------------------------------------------
 
 export {
   frontmatterBranch,
@@ -28,11 +28,11 @@ export {
 } from "./commands/finalise.js";
 export { buildAffectedPackagesFrontmatter } from "./commands/set-affected-packages.js";
 export { validateEntry } from "./commands/validate.js";
+
+// --- lib --------------------------------------------------------------------
+
 export { blank } from "./lib/blank.js";
 export { findEntryByBranch } from "./lib/changelog.js";
-
-// --- lib (pure helpers) -----------------------------------------------------
-
 export { isCliEntry } from "./lib/cli-entry.js";
 export {
   nonMergeCommitCount,

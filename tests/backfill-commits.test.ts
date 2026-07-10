@@ -183,15 +183,32 @@ describe("backfillEntry", () => {
 
   it("resolves the PR from the branch when pr is blank", () => {
     const raw = entryWithPr().replace("pr: 42", "pr:");
-    const run = makeRunner({
-      "gh api": () => COMMITS(3),
-      "gh pr list": () => JSON.stringify([{ number: 77 }]),
-    });
+    const calls: string[] = [];
+    function run(cmd: string, args: readonly string[]): string {
+      const key = `${cmd} ${args.join(" ")}`;
+      calls.push(key);
+      if (key.startsWith("gh pr list")) {
+        return JSON.stringify([{ number: 77 }]);
+      }
+
+      if (key.startsWith("gh api")) {
+        return COMMITS(3);
+      }
+
+      return "";
+    }
+
     const out = backfillEntry(raw, run);
     expect(
       (parseFrontmatter(out as string).data.stats as { commits: number })
         .commits,
     ).toBe(3);
+    expect(calls.some((call) => call.startsWith("gh pr list"))).toBe(true);
+    expect(
+      calls.some((call) =>
+        call.includes("repos/{owner}/{repo}/pulls/77/commits"),
+      ),
+    ).toBe(true);
   });
 
   it("returns null when no merged PR resolves", () => {
