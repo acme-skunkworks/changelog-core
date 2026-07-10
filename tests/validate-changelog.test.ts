@@ -1,4 +1,4 @@
-import { validateEntry } from "../scripts/validate-changelog.js";
+import { validateEntry } from "../src/commands/validate.js";
 import { describe, expect, it } from "vitest";
 
 const VALID_NAME = "20260523-145537-v1-0-3.md";
@@ -28,9 +28,11 @@ describe("validateEntry", () => {
         'version: "1.2.0"',
         'created_at: "2026-05-23T14:55:37Z"',
         'merged_at: "2026-05-24T09:00:00Z"',
-        'branch: "a-123-fix-a-thing"',
+        'branch: "asw-123-fix-a-thing"',
         "pr: 42",
         'commit: "abc1234"',
+        // Unknown keys (e.g. legacy merge_strategy) are tolerated — validate
+        // does not require or type-check them.
         "merge_strategy: squash",
         'author: "you@example.com"',
         "co_authors: []",
@@ -41,23 +43,7 @@ describe("validateEntry", () => {
         "  files_changed: 3",
         "  loc_added: 10",
         "  loc_removed: 2",
-      ].join("\n"),
-    );
-    expect(validateEntry(VALID_NAME, raw)).toEqual([]);
-  });
-
-  it("accepts unquoted YAML timestamps (Date → asIso millisecond precision)", () => {
-    // gray-matter parses unquoted ISO timestamps to JS Date objects, so asIso()
-    // runs them through Date.toISOString() and emits a `.sssZ` fraction. This is
-    // the path the quoted-string cases above never exercise; the regex must
-    // accept the millisecond fraction it produces (regression for A-641).
-    const raw = entry(
-      [
-        'title: "Fix a thing"',
-        "created_at: 2026-05-23T14:55:37Z",
-        "merged_at: 2026-05-24T09:00:00Z",
-        "category: fix",
-        "breaking: false",
+        "  commits: 4",
       ].join("\n"),
     );
     expect(validateEntry(VALID_NAME, raw)).toEqual([]);
@@ -140,13 +126,11 @@ describe("validateEntry", () => {
     ]);
   });
 
-  it("rejects an invalid merge_strategy", () => {
+  it("tolerates an unknown merge_strategy value (field is ignored)", () => {
     const raw = entry(
       'title: "x"\ncreated_at: "2026-05-23T14:55:37Z"\ncategory: fix\nbreaking: false\nmerge_strategy: "fast-forward"',
     );
-    expect(validateEntry(VALID_NAME, raw)).toEqual([
-      expect.stringMatching(/merge_strategy must be one of/),
-    ]);
+    expect(validateEntry(VALID_NAME, raw)).toEqual([]);
   });
 
   it("rejects an unknown category", () => {
@@ -212,12 +196,60 @@ describe("validateEntry", () => {
     ]);
   });
 
+  it("rejects a top-level commits key (must live under stats)", () => {
+    const raw = entry(
+      'title: "x"\ncreated_at: "2026-05-23T14:55:37Z"\ncategory: fix\nbreaking: false\ncommits: 4',
+    );
+    expect(validateEntry(VALID_NAME, raw)).toEqual([
+      expect.stringMatching(/commits must be under stats/),
+    ]);
+  });
+
+  it("rejects a non-integer stats.commits", () => {
+    const raw = entry(
+      [
+        'title: "x"',
+        'created_at: "2026-05-23T14:55:37Z"',
+        "category: fix",
+        "breaking: false",
+        "stats:",
+        '  commits: "lots"',
+      ].join("\n"),
+    );
+    expect(validateEntry(VALID_NAME, raw)).toEqual([
+      expect.stringMatching(/stats\.commits must be a non-negative integer/),
+    ]);
+  });
+
   it("rejects malformed issue IDs", () => {
     const raw = entry(
       'title: "x"\ncreated_at: "2026-05-23T14:55:37Z"\ncategory: fix\nbreaking: false\nissues: ["nope-1"]',
     );
     expect(validateEntry(VALID_NAME, raw)).toEqual([
       expect.stringMatching(/must match \[A-Z\]/),
+    ]);
+  });
+
+  it("accepts a string-array affected_packages (monorepo enrichment)", () => {
+    const raw = entry(
+      'title: "x"\ncreated_at: "2026-05-23T14:55:37Z"\ncategory: fix\nbreaking: false\naffected_packages: ["changelog", "send-it"]',
+    );
+    expect(validateEntry(VALID_NAME, raw)).toEqual([]);
+  });
+
+  it("accepts an empty affected_packages placeholder", () => {
+    const raw = entry(
+      'title: "x"\ncreated_at: "2026-05-23T14:55:37Z"\ncategory: fix\nbreaking: false\naffected_packages: []',
+    );
+    expect(validateEntry(VALID_NAME, raw)).toEqual([]);
+  });
+
+  it("rejects an affected_packages that isn't a string array", () => {
+    const raw = entry(
+      'title: "x"\ncreated_at: "2026-05-23T14:55:37Z"\ncategory: fix\nbreaking: false\naffected_packages: 3',
+    );
+    expect(validateEntry(VALID_NAME, raw)).toEqual([
+      expect.stringMatching(/affected_packages must be an array of strings/),
     ]);
   });
 });

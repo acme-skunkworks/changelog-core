@@ -22,23 +22,32 @@ export default defineConfig([
   { ignores: [".agents/**"] },
   ...base,
   typescript,
-  // infrastructure/ holds the workflow/release shell's CLI tooling (not
-  // published code): it legitimately imports devDependencies (e.g.
-  // gray-matter), and the changelog validator is an inherently branchy flat
-  // list of schema checks, so the default complexity ceiling doesn't apply.
-  // Scoped narrowly to this directory.
+  // Tests and remaining infrastructure/*.mjs helpers legitimately import
+  // devDependencies (vitest, node:fs fixtures). Complexity is off for the
+  // branchy schema-validator suites under tests/.
   {
-    files: ["infrastructure/**/*.{ts,mjs}"],
+    files: ["tests/**/*.{ts,mjs}", "infrastructure/**/*.{ts,mjs}"],
     rules: {
       complexity: "off",
       "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
     },
   },
+  // The published changelog CLI/lib is ported from the zero-dep skill scripts:
+  // validate is an inherently branchy flat list of schema checks, and the
+  // frontmatter parser / argv scanners use non-null assertions after explicit
+  // bounds checks. Complexity + non-null rules don't apply usefully here.
+  {
+    files: ["src/commands/**/*.ts", "src/lib/**/*.ts", "src/cli.ts"],
+    rules: {
+      "@typescript-eslint/no-non-null-assertion": "off",
+      complexity: "off",
+    },
+  },
   // The base preset enables type-aware linting (parserOptions.project: true),
   // which resolves each file to the nearest tsconfig.json. The published build
-  // config (tsconfig.json) is deliberately src-only, so infra/ files aren't in
-  // it. Pin an explicit project that spans src/ + infrastructure/ so type-aware
-  // rules resolve every linted file without leaking infra into the dist build.
+  // config (tsconfig.json) is deliberately src-only, so tests/ aren't in it.
+  // Pin an explicit project that spans src/ + tests/ so type-aware rules
+  // resolve every linted file without leaking tests into the dist build.
   {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {

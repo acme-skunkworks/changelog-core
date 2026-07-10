@@ -1,8 +1,5 @@
-import {
-  readPackageVersion,
-  stampVersion,
-} from "../scripts/stamp-changelog-version.js";
-import matter from "gray-matter";
+import { parseFrontmatter } from "../src/lib/frontmatter.js";
+import { readPackageVersion, stampVersion } from "../src/lib/stamp.js";
 import { describe, expect, it } from "vitest";
 
 function entry(versionLine: string): string {
@@ -26,7 +23,7 @@ describe("stampVersion", () => {
   it("stamps the version onto an entry with an empty placeholder", () => {
     const out = stampVersion(entry("version:"), "1.2.0");
     expect(out).not.toBeNull();
-    expect(matter(out as string).data.version).toBe("1.2.0");
+    expect(parseFrontmatter(out as string).data.version).toBe("1.2.0");
   });
 
   it("returns null (no write) when the entry already has a version", () => {
@@ -37,7 +34,7 @@ describe("stampVersion", () => {
     const raw =
       '---\ntitle: x\ncreated_at: "2026-05-23T14:55:37Z"\ncategory: fix\nbreaking: false\n---\n\n## Fixed\n\n- x\n';
     const out = stampVersion(raw, "2.0.0");
-    expect(matter(out as string).data.version).toBe("2.0.0");
+    expect(parseFrontmatter(out as string).data.version).toBe("2.0.0");
   });
 });
 

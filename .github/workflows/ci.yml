@@ -69,7 +69,7 @@ jobs:
       # file set recursively — reproducing the `lint` script's scope (src +
       # infra scripts; tsconfig.eslint.json also covers tests, which we
       # intentionally omit, matching today's behaviour).
-      eslint-args: src infrastructure/scripts
+      eslint-args: src tests
       # Match the `lint:md` script: include .mdx and the dist/turbo/astro
       # excludes the estate default omits.
       markdown-globs: |
@@ -151,7 +151,7 @@ jobs:
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
           BASE_REF: ${{ github.base_ref }}
-        run: pnpm tsx infrastructure/scripts/check-changelog-completeness.ts
+        run: pnpm tsx src/cli.ts check-completeness
 
   # Single estate release gate (SK-412/SK-424). An always()-run aggregator whose
   # intrinsic check-run, named `GO/NO GO`, succeeds iff every required job above
