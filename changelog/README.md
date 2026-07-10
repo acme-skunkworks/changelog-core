@@ -25,7 +25,6 @@ merged_at: # filled at release (finalisation)
 branch: "asw-123-feature-slug" # stable lookup key for finalisation
 pr: # filled at release
 commit: # 7-char merge SHA; filled at release
-merge_strategy: # squash | merge | rebase; filled at release
 author: "you@example.com"
 co_authors: []
 category: feature # feature | fix | chore | docs | refactor | perf
@@ -98,7 +97,7 @@ Only include `Added` / `Changed` / `Fixed` headings that have entries.
 Two stages — and finalisation rides inside the release-please release PR, so there's no separate workflow and nothing pushes to `main`:
 
 1. **Create or update an entry (PR-time):** run `/send-it` from a feature branch. It writes the entry with the PR-time fields (`title`, `release_note`, `created_at`, `branch`, `author`, `co_authors`, `category`, `breaking`, `issues`) and empty placeholders for the rest. The entry merges to `main` with the feature PR and waits.
-2. **Finalise (at release, inside the release PR):** the orchestrator runs `release-please release-pr` (which bumps `package.json` + `.release-please-manifest.json`) then `finalise-changelog.ts`. For every entry without a `version`, finalise resolves the merged PR from the `branch` field via `gh` — filling `merged_at`, `commit`, `merge_strategy`, `pr`, and `stats` (`files_changed`, `loc_added`, `loc_removed`) — stamps the just-bumped `version`, and rewrites Linear IDs to links. The orchestrator commits these edits into the release PR, which publishes through the normal flow.
+2. **Finalise (at release, inside the release PR):** the orchestrator runs `release-please release-pr` (which bumps `package.json` + `.release-please-manifest.json`) then `finalise-changelog.ts`. For every entry without a `version`, finalise resolves the merged PR from the `branch` field via `gh` — filling `merged_at`, `commit`, `pr`, and `stats` (`files_changed`, `loc_added`, `loc_removed`) — stamps the just-bumped `version`, and rewrites Linear IDs to links. The orchestrator commits these edits into the release PR, which publishes through the normal flow.
 
 **CI validation:** the `build-and-lint` job in `ci.yml` runs `pnpm validate:changelog` on every PR. Malformed entries fail the check. Run it locally with:
 
