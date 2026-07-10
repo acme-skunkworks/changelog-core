@@ -79,16 +79,16 @@ This repo adopts the shared `@acme-skunkworks/agent-skills` bundles, installed v
 - **`/linear-sync`** — transitions the Linear issue(s) linked to the current branch to a target workflow state.
 - **`/cleanup-repo`** — prunes merged Git branches and worktrees, then clears filesystem cruft, behind a single confirmation gate.
 - **`/triage-pr`** — drives a PR from draft-with-failing-CI to merge-ready.
+- **`/initialise-skills`** — generate/reconcile each skill's `config.json` from repo facts.
+- **`/release-status`** — diagnose the release-please pipeline (read-only).
+- **`/commit`** — atomic Conventional Commits from the working tree.
 
-One further skill is **repo-local**, not from the shared bundle (it lives only in this template's `.claude/skills/` + `.agents/skills/`, is not in `skills-lock.json`, and travels into spawned repos via "Use this template"):
+The one-shot `/initialise-package-repo` scaffolder was run at package creation and then
+removed from this repo (it is template-only; not part of the shared skill lock).
 
-- **`/initialise-package-repo`** — the one-shot, idempotent post-generation setup for a repo freshly spawned from this template (A-663 / A-776). Resets `changelog/` to just its README (the changelog-poisoning fix), re-seeds `.release-please-manifest.json`, rewrites the `package.json` identity + `infrastructure/repo-config.yaml` from the repo's own facts, **pulls the shared skills** via `npx skills add … --copy`, **wraps and runs `initialise-skills`** to generate every skill's `config.json`, and applies the non-copied GitHub settings (`npm-release` environment, `GO/NO GO` ruleset, enabling Release) via `gh api` behind a confirmation gate — then verifies-and-reports the org/browser steps it can't automate. It **is** the executable form of the generation checklist at the top of this file. Dry-run first, safe to re-run.
+Each shared-bundle skill ships a neutral `config.example.json`; its real `config.json` is **generated, not committed** (agent-skills v1.1.0 generated-config model, A-640). `.claude/skills/*/config.json` and `.agents/skills/*/config.json` are gitignored. Run the `initialise-skills` skill to generate/reconcile config to this repo's facts after a fresh install or a repo-fact change; it is idempotent (a second dry-run is a no-op).
 
-Each shared-bundle skill ships a neutral `config.example.json`; its real `config.json` is **generated, not committed** (agent-skills v1.1.0 generated-config model, A-640). `.claude/skills/*/config.json` and `.agents/skills/*/config.json` are gitignored, so the template never carries its own values into spawned repos — a tracked `config.json` would leak them. Run the `initialise-skills` skill to generate/reconcile config to this repo's facts (`dist` as the shippable surface, `A` as the Linear issue key) after a fresh install or a repo-fact change; it is idempotent (a second dry-run is a no-op).
-
-**v1.1.0 behavioural changes (A-640).** Riding along with the v1.1.0 re-sync: `/send-it` decides release-type by the change's **semantic category** (the Conventional-Commit type of the work it commits), not by which paths the diff touches — the old `changelogScope`/`shippablePaths`-as-gate model is gone (`shippablePaths` is now advisory only); `/preflight` gains a `blockOnWarnings` knob (defaults to errors-only blocking); `/changelog` add-links is branch-scoped by default.
-
-**Template-propagation note (A-776).** Committed shared skill bundles (installed with `--copy`) remain in this template as **bootstrap** so `/initialise-package-repo` can run immediately after "Use this template". A spawned package then **pulls** the locked shared set once via `npx skills add … --copy` (both agents) before `initialise-skills` materialises per-skill `config.json` — pull-on-instantiation, not inheritance of a frozen tree with no refresh. This template is **not** a skills push-fan-out consumer (dropped in A-774); do not re-add it to the hourly matrix. Stripping the committed bundles entirely in favour of a global install is tracked separately (A-790, blocked on A-781) and is out of scope here. The separate getting-started / scaffold track (A-467) must **not** re-vendor or duplicate these bundles outside that pull path.
+**v1.1.0 behavioural changes (A-640).** `/send-it` decides release-type by the change's **semantic category** (the Conventional-Commit type of the work it commits), not by which paths the diff touches — the old `changelogScope`/`shippablePaths`-as-gate model is gone (`shippablePaths` is now advisory only); `/preflight` gains a `blockOnWarnings` knob (defaults to errors-only blocking); `/changelog` add-links is branch-scoped by default.
 
 ## Source layout
 
