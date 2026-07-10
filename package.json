@@ -39,7 +39,7 @@
   },
   "files": [
     "changelog-contract.md",
-    "config.example.json",
+    "config.json",
     "dist"
   ],
   "scripts": {
@@ -47,8 +47,8 @@
     "act:list": "act --list",
     "act:release:dry": "act push -W .github/workflows/pkg-release.yml",
     "build": "tsc",
-    "changelog:enrich": "tsx src/cli.ts --config config.example.json enrich",
-    "changelog:finalise": "tsx src/cli.ts --config config.example.json finalise",
+    "changelog:enrich": "tsx src/cli.ts --config config.json enrich",
+    "changelog:finalise": "tsx src/cli.ts --config config.json finalise",
     "ci:list": "gh run list --limit 10",
     "ci:view": "gh run view",
     "ci:watch": "gh run watch $(gh run list -L 1 --json databaseId -q '.[0].databaseId // empty')",
@@ -70,7 +70,7 @@
     "test:sh": "bash -c 'if command -v bats >/dev/null 2>&1; then bats infrastructure/tests/*.bats; elif [ \"$(uname -s)\" = \"Darwin\" ]; then echo \"⚠️  bats not installed — skipping. Install: brew install bats-core\"; else echo \"⚠️  bats not installed — skipping. Install: apt-get install bats\"; fi'",
     "test:watch": "vitest",
     "tsc": "tsc --noEmit && tsc -p tsconfig.tools.json",
-    "validate:changelog": "tsx src/cli.ts --config config.example.json validate"
+    "validate:changelog": "tsx src/cli.ts --config config.json validate"
   },
   "lint-staged": {
     "**/*": [

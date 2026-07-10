@@ -22,12 +22,12 @@ path), in order:
 2. `CHANGELOG_CONFIG` env
 3. `.claude/skills/changelog/config.json`
 4. `.agents/skills/changelog/config.json`
-5. `config.example.json` (committed fallback — used by this package's CI scripts)
+5. `config.json` (committed repo-root — stopgap while skill `config.json` stays
+   gitignored; see [agent-skills#122](https://github.com/acme-skunkworks/agent-skills/issues/122) / [A-812](https://linear.app/acme-skunkworks/issue/A-812))
 
-Copy [`config.example.json`](config.example.json) into a skill `config.json` (or
-pass `--config`) and fill the required identity keys (`issueKeys`,
-`linearWorkspaceSlug`). Structural keys (`baseBranch`, `changelogDir`,
-`packageRoots`, `fallbackPackage`, `affectedPackages`) have safe defaults.
+Required identity keys: `issueKeys`, `linearWorkspaceSlug`. Structural keys
+(`baseBranch`, `changelogDir`, `packageRoots`, `fallbackPackage`,
+`affectedPackages`) have safe defaults.
 
 ## CLI
 

@@ -7,7 +7,8 @@
 //   2. process.env.CHANGELOG_CONFIG
 //   3. <cwd>/.claude/skills/changelog/config.json
 //   4. <cwd>/.agents/skills/changelog/config.json
-//   5. <cwd>/config.example.json (committed fallback for CI / fresh clones)
+//   5. <cwd>/config.json (committed repo-root config — stopgap until agent-skills
+//      #122 / Linear follow-up makes skill config.json reliably available in CI)
 //
 // Zero-deps: a plain JSON read. Identity values (`issueKeys`,
 // `linearWorkspaceSlug`) have NO default — a foreign repo that silently inherited
@@ -48,7 +49,7 @@ let cached: ChangelogConfig | undefined;
 
 function fail(message: string, source: string): never {
   throw new Error(
-    `changelog config: ${message} Set it in ${source} (copy config.example.json and fill it in).`,
+    `changelog config: ${message} Set it in ${source} (commit a root config.json, or run initialise-skills for the skill-local copy).`,
   );
 }
 
@@ -156,17 +157,17 @@ function resolveConfigPath(options?: { configPath?: string }): string {
     return agentsPath;
   }
 
-  // Last resort: the committed example shipped with this package (and copied by
-  // consumers). Unblocks CI / fresh clones where skill config.json is gitignored
-  // and not yet materialised by initialise-skills.
-  const examplePath = join(cwd, "config.example.json");
-  if (existsSync(examplePath)) {
-    return examplePath;
+  // Last resort: committed repo-root config.json. Skill-local config.json is
+  // gitignored under the agent-skills generated-config model, so CI / fresh
+  // clones need a tracked path until that gap is fixed (agent-skills#122).
+  const rootPath = join(cwd, "config.json");
+  if (existsSync(rootPath)) {
+    return rootPath;
   }
 
   return fail(
     "config.json not found.",
-    `${claudePath}, ${agentsPath}, or ${examplePath}`,
+    `${claudePath}, ${agentsPath}, or ${rootPath}`,
   );
 }
 

@@ -21,7 +21,7 @@ stats:
 ## Added
 
 - TypeScript package API and `changelog-core` CLI (`validate`, `enrich`, `finalise`, `set-affected-packages`, `add-links`, `backfill-commits`, `check-completeness`)
-- Shipped `changelog-contract.md` and `config.example.json` as the schema source of truth
+- Shipped `changelog-contract.md` and a committed root `config.json` (stopgap while skill config stays gitignored — A-812 / agent-skills#122)
 - Consumer-cwd config resolution (`--config` / `CHANGELOG_CONFIG` / skill config paths)
 - Ported unit tests from the agent-skills changelog suite (229 cases)
 

@@ -173,7 +173,7 @@ function selfTest(): void {
 
   // When the host config has issue keys, a bare ID for the first key linkifies.
   // Wrap loadConfig so --self-test still passes in a fresh consumer cwd with no
-  // config.json / config.example.json yet (masking cases above already ran).
+  // config.json yet (masking cases above already ran).
   try {
     const { issueKeys: teamKeys, linearWorkspaceSlug: workspace } =
       loadConfig();
