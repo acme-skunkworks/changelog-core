@@ -5,8 +5,9 @@ enforces. The `validate` command is the executable form of this contract.
 
 ## Frontmatter schema
 
-Preserve this field order. Emit `affected_packages: []` as a placeholder — the
-enrichment script fills it in place.
+Preserve this field order. When `affectedPackages: true`, emit
+`affected_packages: []` as a placeholder — enrichment fills it in place.
+Single-package repos omit the field entirely.
 
 ```yaml
 ---

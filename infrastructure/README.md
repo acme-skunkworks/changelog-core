@@ -17,7 +17,10 @@ infrastructure/
     fixtures/                       # static inputs shared by tests
 ```
 
-Changelog logic lives in the published package under `src/` (A-803) — `pnpm validate:changelog`, `pnpm changelog:finalise`, and `pnpm tsx src/cli.ts check-completeness` — not under `infrastructure/scripts/`.
+Changelog logic lives in the package source under `src/` (A-803) —
+`pnpm validate:changelog`, `pnpm changelog:finalise`, and
+`pnpm tsx src/cli.ts check-completeness` — not under `infrastructure/scripts/`;
+the published artefact is emitted to `dist/`.
 
 ## Per-script language rule
 

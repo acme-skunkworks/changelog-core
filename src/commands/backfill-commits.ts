@@ -105,9 +105,19 @@ function setStatsCommits(raw: string, commits: number): string {
   }
 
   let statsIndex = -1;
+  let inlineEmptyStats = false;
   for (let index = 1; index < fmEnd; index++) {
-    if (/^stats:\s*$/.test(lines[index]!)) {
+    const line = lines[index]!;
+    if (/^stats:\s*$/.test(line)) {
       statsIndex = index;
+      break;
+    }
+
+    // Serialiser can emit `stats: {}` when the mapping has no children; treat
+    // that as an empty block to expand rather than synthesising a second key.
+    if (/^stats:\s*\{\}\s*$/.test(line)) {
+      statsIndex = index;
+      inlineEmptyStats = true;
       break;
     }
   }
@@ -119,6 +129,12 @@ function setStatsCommits(raw: string, commits: number): string {
     // existing line shifts. The other stats children stay absent — this script
     // sets only stats.commits.
     lines.splice(fmEnd, 0, "stats:", `  commits: ${commits}`);
+    return lines.join("\n");
+  }
+
+  if (inlineEmptyStats) {
+    lines[statsIndex] = "stats:";
+    lines.splice(statsIndex + 1, 0, `  commits: ${commits}`);
     return lines.join("\n");
   }
 

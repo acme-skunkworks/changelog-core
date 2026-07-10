@@ -57,11 +57,11 @@ describe("backfillEntry", () => {
     const out = backfillEntry(raw, makeRunner({ "gh api": () => COMMITS(5) }));
     expect(out).not.toBeNull();
 
-    // The only change is one inserted line.
-    const added = (out as string)
-      .split("\n")
-      .filter((line) => !raw.split("\n").includes(line));
-    expect(added).toEqual(["  commits: 5"]);
+    const expected = raw.replace(
+      "  loc_removed:\n",
+      "  loc_removed:\n  commits: 5\n",
+    );
+    expect(out).toBe(expected);
     expect(
       (parseFrontmatter(out as string).data.stats as { commits: number })
         .commits,
@@ -92,10 +92,11 @@ describe("backfillEntry", () => {
       makeRunner({ "gh api": () => COMMITS(6) }),
     ) as string;
     expect(out).not.toBeNull();
-    const added = out
-      .split("\n")
-      .filter((line) => !raw.split("\n").includes(line));
-    expect(added).toEqual(["    commits: 6"]);
+    const expected = raw.replace(
+      "    loc_removed: 2\n",
+      "    loc_removed: 2\n    commits: 6\n",
+    );
+    expect(out).toBe(expected);
     expect(
       (parseFrontmatter(out).data.stats as { commits: number }).commits,
     ).toBe(6);
@@ -123,11 +124,11 @@ describe("backfillEntry", () => {
       makeRunner({ "gh api": () => COMMITS(4) }),
     ) as string;
     expect(out).not.toBeNull();
-    // A minimal stats: block is appended as the last frontmatter field.
-    const added = out
-      .split("\n")
-      .filter((line) => !raw.split("\n").includes(line));
-    expect(added).toEqual(["stats:", "  commits: 4"]);
+    const expected = raw.replace(
+      "breaking: false\n---",
+      "breaking: false\nstats:\n  commits: 4\n---",
+    );
+    expect(out).toBe(expected);
     expect(
       (parseFrontmatter(out).data.stats as { commits: number }).commits,
     ).toBe(4);
@@ -135,6 +136,30 @@ describe("backfillEntry", () => {
     expect(
       backfillEntry(out, makeRunner({ "gh api": () => COMMITS(4) })),
     ).toBeNull();
+  });
+
+  it("expands an inline empty stats: {} mapping instead of duplicating the key", () => {
+    const raw = [
+      "---",
+      'title: "Fix a thing"',
+      "branch: a-1-fix",
+      "pr: 42",
+      "stats: {}",
+      "---",
+      "",
+      "## Fixed",
+      "",
+      "- A thing.",
+      "",
+    ].join("\n");
+    const out = backfillEntry(
+      raw,
+      makeRunner({ "gh api": () => COMMITS(3) }),
+    ) as string;
+    expect(out).toBe(raw.replace("stats: {}", "stats:\n  commits: 3"));
+    expect(
+      (parseFrontmatter(out).data.stats as { commits: number }).commits,
+    ).toBe(3);
   });
 
   it("is idempotent — re-running yields no change", () => {
