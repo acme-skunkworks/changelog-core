@@ -30,13 +30,13 @@ const DEFAULT_CHANGELOG_DIR = "changelog";
 /**
  * Build the path regex for dated entries under a configured changelog directory.
  */
-export function changelogEntryPattern(changelogDir: string): RegExp {
-  const dir = changelogDir.replace(/\/+$/, "");
-  return new RegExp(`^${escapeRegex(dir)}/.+\\.md$`);
+export function changelogEntryPattern(changelogDirectory: string): RegExp {
+  const directory = changelogDirectory.replace(/\/+$/, "");
+  return new RegExp(`^${escapeRegex(directory)}/.+\\.md$`);
 }
 
-function normalisedChangelogDir(changelogDir: string): string {
-  return changelogDir.replace(/\/+$/, "");
+function normalisedChangelogDirectory(changelogDirectory: string): string {
+  return changelogDirectory.replace(/\/+$/, "");
 }
 
 export function isReleaseTriggering(prTitle: string): boolean {
@@ -46,11 +46,11 @@ export function isReleaseTriggering(prTitle: string): boolean {
 
 export function hasChangelogEntry(
   changedFiles: string[],
-  changelogDir: string = DEFAULT_CHANGELOG_DIR,
+  changelogDirectory: string = DEFAULT_CHANGELOG_DIR,
 ): boolean {
-  const dir = normalisedChangelogDir(changelogDir);
-  const pattern = changelogEntryPattern(dir);
-  const readme = `${dir}/README.md`;
+  const directory = normalisedChangelogDirectory(changelogDirectory);
+  const pattern = changelogEntryPattern(directory);
+  const readme = `${directory}/README.md`;
   return changedFiles.some((file) => pattern.test(file) && file !== readme);
 }
 
@@ -62,7 +62,7 @@ export type CompletenessResult = {
 export function checkCompleteness(
   prTitle: string,
   changedFiles: string[],
-  changelogDir: string = DEFAULT_CHANGELOG_DIR,
+  changelogDirectory: string = DEFAULT_CHANGELOG_DIR,
 ): CompletenessResult {
   if (!isReleaseTriggering(prTitle)) {
     return {
@@ -71,16 +71,16 @@ export function checkCompleteness(
     };
   }
 
-  if (hasChangelogEntry(changedFiles, changelogDir)) {
+  if (hasChangelogEntry(changedFiles, changelogDirectory)) {
     return {
       ok: true,
-      reason: `Release-triggering PR title with a ${normalisedChangelogDir(changelogDir)}/ entry present.`,
+      reason: `Release-triggering PR title with a ${normalisedChangelogDirectory(changelogDirectory)}/ entry present.`,
     };
   }
 
   return {
     ok: false,
-    reason: `PR title "${prTitle}" triggers a release (feat/fix/breaking) but no ${normalisedChangelogDir(changelogDir)}/*.md entry is present in the diff vs the base branch. Run /send-it (or add a dated changelog entry) so the release carries notes.`,
+    reason: `PR title "${prTitle}" triggers a release (feat/fix/breaking) but no ${normalisedChangelogDirectory(changelogDirectory)}/*.md entry is present in the diff vs the base branch. Run /send-it (or add a dated changelog entry) so the release carries notes.`,
   };
 }
 
@@ -193,11 +193,11 @@ export function main(): void {
     process.exit(1);
   }
 
-  const { changelogDir } = loadConfig();
+  const { changelogDir: changelogDirectory } = loadConfig();
   const result = checkCompleteness(
     prTitle,
     readChangedFiles(baseRef),
-    changelogDir,
+    changelogDirectory,
   );
   console.log(result.reason);
   if (!result.ok) {
