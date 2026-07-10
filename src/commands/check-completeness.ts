@@ -1,5 +1,5 @@
 // Changelog-completeness gate (A-380). A release-triggering PR title
-// (`feat`/`fix`/breaking) MUST carry a dated `changelog/` entry. This restores
+// (`feat`/`fix`/breaking) MUST carry a dated changelog entry. This restores
 // the coupling Changesets gave for free — no changeset → no release — now that
 // release-please infers the bump from the Conventional-Commit PR title rather
 // than an explicit file.
@@ -18,22 +18,40 @@
 // Zero-dep: Node built-ins only — no tsx, so CI runs it under bare `node`.
 
 import { isCliEntry } from "../lib/cli-entry.js";
+import { loadConfig } from "../lib/config.js";
+import { escapeRegex } from "../lib/vendor/issue-keys.js";
 import { execFileSync } from "node:child_process";
 import { argv } from "node:process";
 
 const RELEASE_TRIGGERING_TYPE = /^(feat|fix|perf|revert)(\([^)]+\))?:/;
 const BREAKING_SUBJECT = /^[a-z]+(\([^)]+\))?!:/;
-const CHANGELOG_ENTRY = /^changelog\/.+\.md$/;
+const DEFAULT_CHANGELOG_DIR = "changelog";
+
+/**
+ * Build the path regex for dated entries under a configured changelog directory.
+ */
+export function changelogEntryPattern(changelogDir: string): RegExp {
+  const dir = changelogDir.replace(/\/+$/, "");
+  return new RegExp(`^${escapeRegex(dir)}/.+\\.md$`);
+}
+
+function normalisedChangelogDir(changelogDir: string): string {
+  return changelogDir.replace(/\/+$/, "");
+}
 
 export function isReleaseTriggering(prTitle: string): boolean {
   const title = prTitle.trim();
   return BREAKING_SUBJECT.test(title) || RELEASE_TRIGGERING_TYPE.test(title);
 }
 
-export function hasChangelogEntry(changedFiles: string[]): boolean {
-  return changedFiles.some(
-    (file) => CHANGELOG_ENTRY.test(file) && file !== "changelog/README.md",
-  );
+export function hasChangelogEntry(
+  changedFiles: string[],
+  changelogDir: string = DEFAULT_CHANGELOG_DIR,
+): boolean {
+  const dir = normalisedChangelogDir(changelogDir);
+  const pattern = changelogEntryPattern(dir);
+  const readme = `${dir}/README.md`;
+  return changedFiles.some((file) => pattern.test(file) && file !== readme);
 }
 
 export type CompletenessResult = {
@@ -44,6 +62,7 @@ export type CompletenessResult = {
 export function checkCompleteness(
   prTitle: string,
   changedFiles: string[],
+  changelogDir: string = DEFAULT_CHANGELOG_DIR,
 ): CompletenessResult {
   if (!isReleaseTriggering(prTitle)) {
     return {
@@ -52,16 +71,16 @@ export function checkCompleteness(
     };
   }
 
-  if (hasChangelogEntry(changedFiles)) {
+  if (hasChangelogEntry(changedFiles, changelogDir)) {
     return {
       ok: true,
-      reason: "Release-triggering PR title with a changelog/ entry present.",
+      reason: `Release-triggering PR title with a ${normalisedChangelogDir(changelogDir)}/ entry present.`,
     };
   }
 
   return {
     ok: false,
-    reason: `PR title "${prTitle}" triggers a release (feat/fix/breaking) but no changelog/*.md entry is present in the diff vs the base branch. Run /send-it (or add a dated changelog/ entry) so the release carries notes.`,
+    reason: `PR title "${prTitle}" triggers a release (feat/fix/breaking) but no ${normalisedChangelogDir(changelogDir)}/*.md entry is present in the diff vs the base branch. Run /send-it (or add a dated changelog entry) so the release carries notes.`,
   };
 }
 
@@ -79,11 +98,12 @@ function readChangedFiles(baseRef: string): string[] {
     .filter(Boolean);
 }
 
-const USAGE = `check-completeness — gate a release-triggering PR on a dated changelog/ entry
+const USAGE = `check-completeness — gate a release-triggering PR on a dated changelog entry
 
 Reads PR_TITLE and BASE_REF (default "main") from the environment and the changed
 files from \`git diff --name-only origin/<BASE_REF>...HEAD\`. A feat/fix/breaking
-PR title with no changelog/*.md entry in the diff fails the gate (exit 1).
+PR title with no dated entry under the configured changelogDir fails the gate
+(exit 1).
 
 Usage:
   PR_TITLE=… changelog-core check-completeness   Run the gate
@@ -121,6 +141,15 @@ function selfTest(): void {
     {
       name: "changelog/README.md does not satisfy the gate",
       ok: checkCompleteness("fix: y", ["changelog/README.md"]).ok === false,
+    },
+    {
+      name: "custom changelogDir is honoured",
+      ok:
+        checkCompleteness(
+          "feat: x",
+          ["changelogs/20260101-000000-a-1-x.md"],
+          "changelogs",
+        ).ok === true,
     },
     {
       name: "non-release-triggering title passes with no entry",
@@ -164,7 +193,12 @@ export function main(): void {
     process.exit(1);
   }
 
-  const result = checkCompleteness(prTitle, readChangedFiles(baseRef));
+  const { changelogDir } = loadConfig();
+  const result = checkCompleteness(
+    prTitle,
+    readChangedFiles(baseRef),
+    changelogDir,
+  );
   console.log(result.reason);
   if (!result.ok) {
     process.exit(1);

@@ -10,15 +10,13 @@
 // The changelog directory itself is skipped — it's touched by every entry and
 // would otherwise pin `fallbackPackage` onto every package list.
 
+import { escapeRegex } from "./vendor/issue-keys.js";
+
 // Mirror config.ts's DEFAULTS so this function works standalone (e.g. in unit
 // tests) without loading config; keep the two in sync if the defaults change.
 const DEFAULT_PACKAGE_ROOTS = ["apps", "packages", "services"];
 const DEFAULT_FALLBACK_PACKAGE = "infrastructure";
 const DEFAULT_CHANGELOG_DIR = "changelog";
-
-function escapeRegex(source: string): string {
-  return source.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
 
 export type DerivePackagesOptions = {
   changelogDir?: string;

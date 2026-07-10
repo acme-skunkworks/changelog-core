@@ -7,6 +7,7 @@
 // composes it with the PR data it resolves from `gh`. Kept pure so it's
 // trivially unit-testable. Zero-dep — uses the package's frontmatter parser.
 
+import { blank } from "./blank.js";
 import { parseFrontmatter, stringifyFrontmatter } from "./frontmatter.js";
 
 export type EnrichInput = {
@@ -31,13 +32,6 @@ export type EnrichInput = {
   mergeSha: string;
   prNumber?: null | string;
 };
-
-/**
- * True when a value is unset (null/undefined/"").
- */
-function blank(value: unknown): boolean {
-  return value === null || value === undefined || value === "";
-}
 
 /**
  * Apply enrichment to a single entry's raw markdown and return the rewritten

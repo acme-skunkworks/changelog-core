@@ -16,7 +16,24 @@
 // remote and merges the paged arrays, so PRs with more than one page of commits
 // still count correctly.
 
+import { execFileSync } from "node:child_process";
+
 export type Runner = (cmd: string, args: readonly string[]) => string;
+
+/**
+ * Default Runner backed by `execFileSync` — shared by finalise and
+ * backfill-commits so the timeout / stdio options can't drift.
+ */
+export function realRunner(cmd: string, args: readonly string[]): string {
+  return execFileSync(cmd, args, {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "inherit"],
+    // Fail fast if gh/git stalls (network/auth). Enrichment is best-effort, so
+    // a timeout throws → callers' try/catch falls back rather than hanging the
+    // release until the whole job times out.
+    timeout: 30_000,
+  });
+}
 
 /**
  * Count a merged PR's commits, excluding merge commits (more than one parent).

@@ -27,23 +27,14 @@
 // so it runs under bare `node`.
 
 import { isCliEntry } from "../lib/cli-entry.js";
-import { nonMergeCommitCount } from "../lib/commit-count.js";
+import { nonMergeCommitCount, realRunner } from "../lib/commit-count.js";
 import type { Runner } from "../lib/commit-count.js";
 import { loadConfig } from "../lib/config.js";
 import { parseFrontmatter } from "../lib/frontmatter.js";
 import type { FrontmatterData } from "../lib/frontmatter.js";
-import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { argv } from "node:process";
-
-function realRunner(cmd: string, args: readonly string[]): string {
-  return execFileSync(cmd, args, {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "inherit"],
-    timeout: 30_000,
-  });
-}
 
 /**
  * Resolve the merged PR number for an entry: prefer the recorded `pr` field,

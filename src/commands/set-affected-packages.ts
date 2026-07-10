@@ -23,6 +23,7 @@ import { parseFrontmatter, stringifyFrontmatter } from "../lib/frontmatter.js";
 import type { FrontmatterData } from "../lib/frontmatter.js";
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
+import { argv, env } from "node:process";
 
 /**
  * Rebuild an entry's frontmatter with `affected_packages` set, in canonical
@@ -83,7 +84,7 @@ function git(args: string[]): string {
 }
 
 function currentBranch(): string {
-  const fromEnvironment = process.env.BRANCH_NAME?.trim();
+  const fromEnvironment = env.BRANCH_NAME?.trim();
   if (fromEnvironment) {
     return fromEnvironment;
   }
@@ -163,7 +164,7 @@ function selfTest(): void {
 }
 
 export function main(): void {
-  const args = process.argv.slice(2);
+  const args = argv.slice(2);
   if (args.includes("--help") || args.includes("-h")) {
     console.log(USAGE);
     return;
@@ -196,8 +197,7 @@ export function main(): void {
     process.exit(0);
   }
 
-  const BASE_REF =
-    process.env.BASE_REF?.trim() || `origin/${config.baseBranch}`;
+  const BASE_REF = env.BASE_REF?.trim() || `origin/${config.baseBranch}`;
 
   const branch = currentBranch();
   const file = findEntryByBranch(branch, config.changelogDir);

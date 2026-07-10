@@ -13,6 +13,7 @@ export {
 } from "./commands/add-links.js";
 export { backfillEntry, resolvePrNumber } from "./commands/backfill-commits.js";
 export {
+  changelogEntryPattern,
   checkCompleteness,
   type CompletenessResult,
   hasChangelogEntry,
@@ -27,12 +28,17 @@ export {
 } from "./commands/finalise.js";
 export { buildAffectedPackagesFrontmatter } from "./commands/set-affected-packages.js";
 export { validateEntry } from "./commands/validate.js";
+export { blank } from "./lib/blank.js";
 export { findEntryByBranch } from "./lib/changelog.js";
-export { isCliEntry } from "./lib/cli-entry.js";
 
 // --- commands (pure helpers) -----------------------------------------------
 
-export { nonMergeCommitCount, type Runner } from "./lib/commit-count.js";
+export { isCliEntry } from "./lib/cli-entry.js";
+export {
+  nonMergeCommitCount,
+  realRunner,
+  type Runner,
+} from "./lib/commit-count.js";
 export {
   type ChangelogConfig,
   loadConfig,

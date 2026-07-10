@@ -17,15 +17,15 @@
 // under bare `node`. The Linear workspace/issue keys come from config.json via
 // add-links, not hardcoded constants.
 
+import { blank } from "../lib/blank.js";
 import { isCliEntry } from "../lib/cli-entry.js";
-import { nonMergeCommitCount } from "../lib/commit-count.js";
+import { nonMergeCommitCount, realRunner } from "../lib/commit-count.js";
 import type { Runner } from "../lib/commit-count.js";
 import { loadConfig } from "../lib/config.js";
 import { enrichFrontmatter } from "../lib/enrich.js";
 import { parseFrontmatter } from "../lib/frontmatter.js";
 import { readPackageVersion, stampVersion } from "../lib/stamp.js";
 import { rewriteBody, splitFrontmatter } from "./add-links.js";
-import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { argv } from "node:process";
@@ -44,13 +44,6 @@ export type ResolvedPr = {
  * Resolve the merged PR for a branch, or null when none is found.
  */
 export type PrResolver = (branch: string) => null | ResolvedPr;
-
-/**
- * True when a value is unset (null/undefined/"").
- */
-function blank(value: unknown): boolean {
-  return value === null || value === undefined || value === "";
-}
 
 /**
  * Finalise one entry's raw markdown for release. Returns the rewritten markdown,
@@ -111,17 +104,6 @@ export function finaliseEntry(
   next = fmText + rewriteBody(body);
 
   return next === raw ? null : next;
-}
-
-function realRunner(cmd: string, args: readonly string[]): string {
-  return execFileSync(cmd, args, {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "inherit"],
-    // Fail fast if gh/git stalls (network/auth). Enrichment is best-effort, so
-    // a timeout throws → makeResolver's try/catch falls back to null rather
-    // than hanging the release until the whole job times out.
-    timeout: 30_000,
-  });
 }
 
 /**

@@ -76,6 +76,21 @@ describe("hasChangelogEntry", () => {
       hasChangelogEntry(["package.json", "skills/cleanup-repo/SKILL.md"]),
     ).toBe(false);
   });
+
+  it("honours a custom changelogDir", () => {
+    expect(
+      hasChangelogEntry(
+        ["changelogs/20260623-101010-add-cleanup-step.md"],
+        "changelogs",
+      ),
+    ).toBe(true);
+    expect(
+      hasChangelogEntry(
+        ["changelog/20260623-101010-add-cleanup-step.md"],
+        "changelogs",
+      ),
+    ).toBe(false);
+  });
 });
 
 describe("checkCompleteness", () => {
@@ -105,5 +120,14 @@ describe("checkCompleteness", () => {
       "skills/cleanup-repo/SKILL.md",
     ]);
     expect(result.ok).toBe(false);
+  });
+
+  it("passes when the entry lives under a custom changelogDir", () => {
+    const result = checkCompleteness(
+      "feat: add skill",
+      ["changelogs/20260623-101010-add-cleanup-step.md"],
+      "changelogs",
+    );
+    expect(result.ok).toBe(true);
   });
 });

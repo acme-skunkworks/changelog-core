@@ -5,14 +5,8 @@
 // these. Kept pure so they're trivially unit-testable. Zero-dep — uses the
 // package's frontmatter parser.
 
+import { blank } from "./blank.js";
 import { parseFrontmatter, stringifyFrontmatter } from "./frontmatter.js";
-
-/**
- * True when a value is unset (null/undefined/"").
- */
-function blank(value: unknown): boolean {
-  return value === null || value === undefined || value === "";
-}
 
 /**
  * Stamp `version` onto an entry if it has none. Returns the rewritten markdown,
