@@ -7,6 +7,7 @@
 //   2. process.env.CHANGELOG_CONFIG
 //   3. <cwd>/.claude/skills/changelog/config.json
 //   4. <cwd>/.agents/skills/changelog/config.json
+//   5. <cwd>/config.example.json (committed fallback for CI / fresh clones)
 //
 // Zero-deps: a plain JSON read. Identity values (`issueKeys`,
 // `linearWorkspaceSlug`) have NO default — a foreign repo that silently inherited
@@ -155,7 +156,18 @@ function resolveConfigPath(options?: { configPath?: string }): string {
     return agentsPath;
   }
 
-  return fail("config.json not found.", `${claudePath} or ${agentsPath}`);
+  // Last resort: the committed example shipped with this package (and copied by
+  // consumers). Unblocks CI / fresh clones where skill config.json is gitignored
+  // and not yet materialised by initialise-skills.
+  const examplePath = join(cwd, "config.example.json");
+  if (existsSync(examplePath)) {
+    return examplePath;
+  }
+
+  return fail(
+    "config.json not found.",
+    `${claudePath}, ${agentsPath}, or ${examplePath}`,
+  );
 }
 
 /**
