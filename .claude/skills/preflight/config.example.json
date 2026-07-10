@@ -1,0 +1,7 @@
+{
+  "baseBranch": "main",
+  "blockOnWarnings": false,
+  "workspaces": {
+    "web": { "filter": "@acme/web", "prefix": "apps/web/" }
+  }
+}
