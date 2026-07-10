@@ -1,21 +1,24 @@
 ---
-title: "Extract changelog logic into @acme-skunkworks/changelog-core"
-release_note: "Shared validate/enrich/finalise CLI and contract for dated changelog entries, without merge_strategy."
-created_at: "2026-07-10T10:44:36Z"
-merged_at:
-branch: "a-803-phase-1-create-acme-skunkworkschangelog-core-extract"
-pr:
-commit:
-author: "rob@acmeskunkworks.io"
+title: Extract changelog logic into @acme-skunkworks/changelog-core
+release_note: Shared validate/enrich/finalise CLI and contract for dated changelog entries, without merge_strategy.
+created_at: '2026-07-10T10:44:36Z'
+merged_at: '2026-07-10T11:35:49Z'
+branch: a-803-phase-1-create-acme-skunkworkschangelog-core-extract
+pr: 2
+commit: 7160af0
+author: rob@acmeskunkworks.io
 co_authors: []
 category: feature
 breaking: false
-issues: ["A-803", "A-812"]
+issues:
+  - A-803
+  - A-812
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
-  commits:
+  files_changed: 97
+  loc_added: 4819
+  loc_removed: 5063
+  commits: 12
+version: 1.1.0
 ---
 
 ## Added
