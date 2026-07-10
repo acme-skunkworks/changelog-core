@@ -159,7 +159,7 @@ function resolveConfigPath(options?: { configPath?: string }): string {
 
   // Last resort: committed repo-root config.json. Skill-local config.json is
   // gitignored under the agent-skills generated-config model, so CI / fresh
-  // clones need a tracked path until that gap is fixed (agent-skills#122).
+  // clones need a tracked path until that gap is fixed (A-812).
   const rootPath = join(cwd, "config.json");
   if (existsSync(rootPath)) {
     return rootPath;
