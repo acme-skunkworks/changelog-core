@@ -95,12 +95,18 @@ Only include `Added` / `Changed` / `Fixed` headings that have entries.
 
 ## Lifecycle
 
-Two stages — and finalisation rides inside the release-please release PR, so there's no separate workflow and nothing pushes to `main`:
+Two stages — authored in the feature PR, enriched in-repo after merge by a shared reusable workflow (no orchestrator, nothing pushing to `main` outside the normal flow):
 
 1. **Create or update an entry (PR-time):** run `/send-it` from a feature branch. It writes the entry with the PR-time fields (`title`, `release_note`, `created_at`, `branch`, `author`, `co_authors`, `category`, `breaking`, `issues`) and empty placeholders for the rest. The entry merges to `main` with the feature PR and waits.
-2. **Finalise (at release, inside the release PR):** the orchestrator runs `release-please release-pr` (which bumps `package.json` + `.release-please-manifest.json`) then `finalise-changelog.ts`. For every entry without a `version`, finalise resolves the merged PR from the `branch` field via `gh` — filling `merged_at`, `commit`, `pr`, and `stats` (`files_changed`, `loc_added`, `loc_removed`, `commits`) — stamps the just-bumped `version`, and rewrites Linear IDs to links. The orchestrator commits these edits into the release PR, which publishes through the normal flow.
+2. **Enrich / finalise (post-merge, in-repo):** the estate's shared `reusable-changelog-enrich.yml` runs in the consumer repo after merge, driving the `changelog-core` CLI in one of two modes — the modes differ in **where the PR data comes from** and **what they fill**:
+   - **`mode: enrich`** (deploy targets — `changelog-core enrich`) is **env-driven**: the workflow passes the merged PR's data (`BRANCH_NAME`, `MERGED_AT`, `MERGE_SHA`, and optionally `PR_NUMBER` / additions / deletions / changed-files) as env vars; the CLI finds the entry by its `branch` field and fills `merged_at`, `commit`, `pr`, and the `stats` it was handed (`files_changed`, `loc_added`, `loc_removed`). It does **not** call `gh`, leaves `stats.commits` and `version` for the release-time path, and rewrites no links.
+   - **`mode: finalise`** (npm targets — `changelog-core finalise`) is the **release-time** path: for every entry without a `version` it resolves the merged PR from the `branch` field **via `gh`** (filling `merged_at`, `commit`, `pr`, and the full `stats` including `commits`), stamps the just-published `version`, and rewrites bare Linear IDs to links.
 
-**CI validation:** the `build-and-lint` job in `ci.yml` runs `pnpm validate:changelog` on every PR. Malformed entries fail the check. Run it locally with:
+   Both modes are fill-once and re-run-safe (idempotent).
+
+> **This repo is the exception.** `changelog-core`'s own `pkg-release.yml` is publish-only and does **not** wire an enrich/finalise job (there is no `reusable-changelog-enrich.yml` here), so its own entries are not self-stamped: the v1.1.0 bootstrap entries carry a `version`, but entries merged since stay versionless. The two-mode model above is what consumer repos run; this repo documents the contract it produces.
+
+**CI validation:** the `lint` job in `ci.yml` (via the shared `reusable-lint.yml`) runs `pnpm validate:changelog` on every PR. Malformed entries fail the check. Run it locally with:
 
 ```bash
 pnpm validate:changelog
