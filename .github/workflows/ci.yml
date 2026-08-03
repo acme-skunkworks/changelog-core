@@ -3,10 +3,13 @@ name: CI
 on:
   pull_request:
     # `edited` is included so the changelog-completeness gate re-runs when a
-    # title is corrected — the PR title is the release-please bump signal
-    # (SK-371), so a stale pass on an old title would be unsafe. (The PR-title
-    # lint itself now lives in validate-pr-title.yml, which also re-runs on
-    # `edited`.) The default set is opened/synchronize/reopened.
+    # title is corrected. Conventional PR titles stay required (CI); under dual
+    # merge policy (A-1176) feature PRs land as merge commits and release-please
+    # ranks Conventional Commits on main (A-824) — the title is no longer the
+    # sole post-merge bump signal. A stale completeness pass on an old title
+    # would still be unsafe. (The PR-title lint itself now lives in
+    # validate-pr-title.yml, which also re-runs on `edited`.) The default set
+    # is opened/synchronize/reopened.
     types: [opened, edited, synchronize, reopened]
 
 concurrency:
