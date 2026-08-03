@@ -115,6 +115,29 @@ describe("finaliseEntry", () => {
     expect(data.pr ?? "").toBe("");
   });
 
+  it("enriches multi-commit stats from a 2-parent mergeCommit OID (A-825)", () => {
+    const multiCommitPr: ResolvedPr = {
+      additions: "120",
+      changedFiles: "15",
+      commits: "5",
+      deletions: "30",
+      mergedAt: "2026-08-01T12:00:00Z",
+      mergeSha: "aabbccddeeff00112233445566778899aabbccdd",
+      prNumber: "8",
+    };
+    const out = finaliseEntry(placeholderEntry(), "1.3.0", () => multiCommitPr);
+    expect(out).not.toBeNull();
+    const { data } = parseFrontmatter(out as string);
+    expect(data.commit).toBe("aabbccd"); // first 7 of mergeSha
+    expect(data.pr).toBe(8);
+    expect(data.stats).toEqual({
+      commits: 5,
+      files_changed: 15,
+      loc_added: 120,
+      loc_removed: 30,
+    });
+  });
+
   it("does not call the resolver when the entry has no branch", () => {
     const raw = placeholderEntry().replace(
       'branch: "asw-123-fix-a-thing"',
@@ -161,7 +184,9 @@ function throwingRunner(): string {
 }
 
 describe("makeResolver", () => {
-  it("maps gh JSON to ResolvedPr from a single-parent merge commit", () => {
+  it("maps gh JSON to ResolvedPr from a squash-shaped mergeCommit OID", () => {
+    // Squash merges land as a single-parent commit on trunk; mergeCommit.oid is
+    // that squash SHA (not a 2-parent merge commit).
     const { run } = makeRunner({
       "gh pr list": () =>
         JSON.stringify([
@@ -188,6 +213,37 @@ describe("makeResolver", () => {
       mergeSha: "merge111",
       prNumber: "42",
     });
+  });
+
+  it("maps a 2-parent merge-commit OID and counts authored commits (A-825)", () => {
+    const { run } = makeRunner({
+      "gh api": () =>
+        JSON.stringify([
+          { parents: [{ sha: "p1" }] },
+          { parents: [{ sha: "p2" }] },
+          { parents: [{ sha: "p3" }] },
+          { parents: [{ sha: "p4" }] },
+          { parents: [{ sha: "p5" }] },
+          // The 2-parent merge commit on trunk is excluded from the count.
+          { parents: [{ sha: "p6" }, { sha: "p7" }] },
+        ]),
+      "gh pr list": () =>
+        JSON.stringify([
+          {
+            additions: 10,
+            changedFiles: 3,
+            deletions: 2,
+            mergeCommit: {
+              oid: "aabbccddeeff00112233445566778899aabbccdd",
+            },
+            mergedAt: "2026-05-24T09:00:00Z",
+            number: 8,
+          },
+        ]),
+    });
+    const resolved = makeResolver(run)("a-825-multi-commit-branch");
+    expect(resolved?.mergeSha).toBe("aabbccddeeff00112233445566778899aabbccdd");
+    expect(resolved?.commits).toBe("5");
   });
 
   it("resolves the non-merge commit count from the PR commits API", () => {

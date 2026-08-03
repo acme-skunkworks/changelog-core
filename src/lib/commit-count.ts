@@ -2,13 +2,19 @@
 // REST commits endpoint. Shared by finalise (release-time enrichment) and
 // backfill-commits (the one-off backlog backfill) — A-560.
 //
-// Squash-merging collapses a PR to a single commit on `main`, so the per-commit
-// count is lost from local Git history — but the PR commits endpoint still
-// returns the original branch commits post-merge, so the count stays
-// recoverable. Excluding merge commits drops `main`-merge resolution commits
-// (those with more than one parent) so the count reflects authored work rather
-// than branch upkeep; the REST commit object's `parents` array is the reliable
-// signal (`gh pr view --json commits` omits parent data).
+// Works for both squash and merge-commit trunk strategies (A-825):
+//
+// - **Squash:** the per-commit count is lost from local trunk history (the PR
+//   lands as a single-parent squash SHA), but the PR commits endpoint still
+//   returns the original branch commits post-merge, so the count stays
+//   recoverable.
+// - **Merge commits on trunk:** branch history is preserved on `main`; the same
+//   PR commits endpoint still yields the authored (non-merge) count. Excluding
+//   commits with more than one parent also drops the merge commit itself and
+//   any `main`-merge upkeep commits on the branch.
+//
+// In both cases the REST commit object's `parents` array is the reliable signal
+// (`gh pr view --json commits` omits parent data).
 //
 // Runner-injectable `(cmd, args) -> stdout`, mirroring finalise's makeResolver,
 // so it's unit-testable with a fake runner and never reaches the network in

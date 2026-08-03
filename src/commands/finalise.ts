@@ -1,7 +1,7 @@
-// Release-time finalisation of changelog entries — run by the orchestrator
-// right after `release-please release-pr` (A-380/A-376), so the result is
-// committed into the release PR (no separate workflow, no bot push to main).
-// Reads the just-bumped version from package.json, which release-please updated.
+// Release-time finalisation of changelog entries — in-repo via
+// `reusable-changelog-enrich.yml` mode `finalise` / `changelog-core finalise`
+// after release-please bumps package.json (A-801 retired the central orchestrator
+// finalise). Reads the just-bumped version from package.json.
 //
 // For every entry that isn't finalised yet (empty `version`):
 //   1. resolve its merged PR from the `branch` field via `gh` and enrich
@@ -185,10 +185,10 @@ export function makeResolver(run: Runner): PrResolver {
 
 const USAGE = `finalise — release-time enrich + version-stamp the dated changelog/ entries
 
-Run by the release orchestrator right after \`release-please release-pr\`. Reads the
-just-bumped version from package.json, then for every un-finalised entry: resolves
-its merged PR via \`gh\` to enrich (merged_at/commit/pr/stats), stamps \`version\`,
-and rewrites bare Linear IDs to links. WRITES to changelog/ files.
+In-repo via \`reusable-changelog-enrich.yml\` mode \`finalise\` / \`changelog-core finalise\`
+after release-please bumps package.json. Reads the just-bumped version, then for every
+un-finalised entry: resolves its merged PR via \`gh\` to enrich (merged_at/commit/pr/stats),
+stamps \`version\`, and rewrites bare Linear IDs to links. WRITES to changelog/ files.
 
 Usage:
   changelog-core finalise            Finalise every un-finalised entry (writes; needs gh)
