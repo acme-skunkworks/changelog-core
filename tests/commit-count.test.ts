@@ -60,6 +60,23 @@ describe("nonMergeCommitCount", () => {
     ).toBeNull();
   });
 
+  it("counts authored commits across a longer multi-commit PR history (A-825)", () => {
+    // 6 single-parent authored commits + 2 merge commits (branch upkeep) → "6".
+    const run = runnerReturning(
+      JSON.stringify([
+        { parents: [{ sha: "p1" }] },
+        { parents: [{ sha: "p2" }] },
+        { parents: [{ sha: "p3" }, { sha: "p4" }] }, // main merge on branch
+        { parents: [{ sha: "p5" }] },
+        { parents: [{ sha: "p6" }] },
+        { parents: [{ sha: "p7" }, { sha: "p8" }] }, // second main merge
+        { parents: [{ sha: "p9" }] },
+        { parents: [{ sha: "pa" }] },
+      ]),
+    );
+    expect(nonMergeCommitCount(run, 144)).toBe("6");
+  });
+
   it("requests the merged PR's commits via the {owner}/{repo} REST endpoint", () => {
     const calls: Array<{ args: readonly string[]; cmd: string }> = [];
     function run(cmd: string, args: readonly string[]): string {
