@@ -23,7 +23,7 @@ path), in order:
 3. `.claude/skills/changelog/config.json`
 4. `.agents/skills/changelog/config.json`
 5. `config.json` (committed repo-root — stopgap while skill `config.json` stays
-   gitignored; see [A-812](https://linear.app/acme-skunkworks/issue/A-812))
+   gitignored; see [A-812](https://linear.app/rheged-studio/issue/A-812))
 
 Required identity keys: `issueKeys`, `linearWorkspaceSlug`. Structural keys
 (`baseBranch`, `changelogDir`, `packageRoots`, `fallbackPackage`,

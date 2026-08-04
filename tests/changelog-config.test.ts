@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 const VALID = {
   issueKeys: ["A"],
-  linearWorkspaceSlug: "acme-skunkworks",
+  linearWorkspaceSlug: "rheged-studio",
 };
 
 function raw(object: unknown): string {
@@ -20,7 +20,7 @@ describe("parseConfig", () => {
       changelogDir: "changelog",
       fallbackPackage: "infrastructure",
       issueKeys: ["A"],
-      linearWorkspaceSlug: "acme-skunkworks",
+      linearWorkspaceSlug: "rheged-studio",
       packageRoots: ["apps", "packages", "services"],
     });
   });

@@ -21,5 +21,5 @@ stats:
 
 ## Changed
 
-- Updated `CLAUDE.md` release wording for dual merge policy: feature PRs land as merge commits; release-please ranks Conventional Commits on `main` ([A-824](https://linear.app/acme-skunkworks/issue/A-824)); Conventional PR titles stay CI-required but are no longer the sole post-merge bump signal; the orchestrator still squash-merges the release PR and fan-out stays squash ([A-1176](https://linear.app/acme-skunkworks/issue/A-1176)).
+- Updated `CLAUDE.md` release wording for dual merge policy: feature PRs land as merge commits; release-please ranks Conventional Commits on `main` ([A-824](https://linear.app/rheged-studio/issue/A-824)); Conventional PR titles stay CI-required but are no longer the sole post-merge bump signal; the orchestrator still squash-merges the release PR and fan-out stays squash ([A-1176](https://linear.app/rheged-studio/issue/A-1176)).
 - Clarified the `ci.yml` `edited` comment so completeness still re-runs on title edits without treating the PR title as the sole bump signal.
