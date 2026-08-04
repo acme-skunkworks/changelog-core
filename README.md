@@ -1,6 +1,6 @@
 # @acme-skunkworks/changelog-core
 
-Shared **changelog contract** and dual-runtime **CLI** for Acme Skunkworks —
+Shared **changelog contract** and dual-runtime **CLI** for Rheged Studio —
 validate, enrich, and finalise dated `changelog/` entries from CI **and** local
 dev. One package replaces the triplicated skill `.mjs` + per-repo
 `infrastructure/scripts` copies.
