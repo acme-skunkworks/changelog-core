@@ -21,4 +21,4 @@ stats:
 
 ## Changed
 
-**Linear identity for Rheged Studio ([A-1234](https://linear.app/rheged-studio/issue/A-1234))** — set root `config.json` `linearWorkspaceSlug` to `rheged-studio`, update hardcoded Linear URL fixtures in the add-links / finalise / config tests so they stay green, and rewrite committed `linear.app/acme-skunkworks` links in README and dated changelog entries.
+**Linear identity for Rheged Studio ([A-1234](https://linear.app/rheged-studio/issue/A-1234))** — set root `config.json` `linearWorkspaceSlug` to `rheged-studio`, update hardcoded Linear URL fixtures in the add-links / finalise / config tests so they stay green, and rewrite committed Linear workspace links in README and dated changelog entries to the current slug.
