@@ -53,7 +53,7 @@ describe("finaliseEntry", () => {
       loc_removed: 2,
     });
     expect(content).toContain(
-      "[A-123](https://linear.app/acme-skunkworks/issue/A-123)",
+      "[A-123](https://linear.app/rheged-studio/issue/A-123)",
     );
   });
 

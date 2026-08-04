@@ -11,7 +11,7 @@ writeFileSync(
   configPath,
   JSON.stringify({
     issueKeys: ["A"],
-    linearWorkspaceSlug: "acme-skunkworks",
+    linearWorkspaceSlug: "rheged-studio",
   }),
 );
 process.env.CHANGELOG_CONFIG = configPath;

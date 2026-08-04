@@ -1,5 +1,5 @@
 // `rewriteBody` loads config via the shared vitest setup (issue key A,
-// workspace acme-skunkworks). Reference-style label masking is covered in
+// workspace rheged-studio). Reference-style label masking is covered in
 // ./add-links-reference-masking.test.ts; this suite covers the issue-key
 // rewrite happy path plus inline-code / fenced-block masking and the
 // splitFrontmatter contract.
@@ -11,7 +11,7 @@ import {
 import { describe, expect, it } from "vitest";
 
 function url(id: string) {
-  return `https://linear.app/acme-skunkworks/issue/${id}`;
+  return `https://linear.app/rheged-studio/issue/${id}`;
 }
 
 describe("rewriteBody — issue-key linking (happy path)", () => {

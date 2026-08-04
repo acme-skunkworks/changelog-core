@@ -1,5 +1,5 @@
 // `rewriteBody` loads config via the shared vitest setup (issue key A,
-// workspace acme-skunkworks).
+// workspace rheged-studio).
 import { rewriteBody } from "../src/commands/add-links.js";
 import { describe, expect, it } from "vitest";
 
@@ -29,12 +29,12 @@ describe("rewriteBody — reference-style link masking (bug 4)", () => {
   it("still links a bare ID alongside a reference-style label", () => {
     const body = "Closes A-9, tracked in [A-123][1].";
     expect(rewriteBody(body)).toBe(
-      "Closes [A-9](https://linear.app/acme-skunkworks/issue/A-9), tracked in [A-123][1].",
+      "Closes [A-9](https://linear.app/rheged-studio/issue/A-9), tracked in [A-123][1].",
     );
   });
 
   it("is idempotent on an already-linked inline ID (regression guard)", () => {
-    const body = "[A-123](https://linear.app/acme-skunkworks/issue/A-123)";
+    const body = "[A-123](https://linear.app/rheged-studio/issue/A-123)";
     expect(rewriteBody(body)).toBe(body);
     expect(rewriteBody(rewriteBody(body))).toBe(body);
   });
@@ -63,7 +63,7 @@ describe("rewriteBody — reference-style link masking (bug 4)", () => {
   it("still links a bare ID in prose while leaving the definition intact", () => {
     const body = "Closes A-9.\n\n[A-123]: https://example.com/whatever\n";
     expect(rewriteBody(body)).toBe(
-      "Closes [A-9](https://linear.app/acme-skunkworks/issue/A-9).\n\n[A-123]: https://example.com/whatever\n",
+      "Closes [A-9](https://linear.app/rheged-studio/issue/A-9).\n\n[A-123]: https://example.com/whatever\n",
     );
   });
 });
