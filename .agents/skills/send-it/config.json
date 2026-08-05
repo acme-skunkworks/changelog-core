@@ -1,0 +1,16 @@
+{
+  "baseBranch": "main",
+  "shippablePaths": [
+    "changelog-contract.md",
+    "config.json",
+    "dist"
+  ],
+  "shippableManifestKeys": [
+    "name",
+    "version",
+    "files",
+    "publishConfig"
+  ],
+  "changelog": true,
+  "triage": true
+}
