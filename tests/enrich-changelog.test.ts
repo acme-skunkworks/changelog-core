@@ -100,6 +100,16 @@ describe("enrichFrontmatter", () => {
     expect(parseFrontmatter(out).data.created_at).toBe("2026-05-23T14:55:37Z");
   });
 
+  it("emits double-quoted ISO timestamps (Prettier-compatible)", () => {
+    // A-1308: enrich must not rewrite authored double-quoted timestamps into
+    // single quotes that fail consumer `prettier --check`.
+    const out = enrichFrontmatter(placeholderEntry(), BASE);
+    expect(out).toContain('created_at: "2026-05-23T14:55:37Z"');
+    expect(out).toContain('merged_at: "2026-05-24T09:00:00Z"');
+    expect(out).not.toMatch(/created_at: '/);
+    expect(out).not.toMatch(/merged_at: '/);
+  });
+
   it("does not introduce an affected_packages field", () => {
     const out = enrichFrontmatter(placeholderEntry(), BASE);
     expect(parseFrontmatter(out).data).not.toHaveProperty("affected_packages");

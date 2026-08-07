@@ -364,15 +364,14 @@ function serialiseString(string_: string): string {
     return string_;
   }
 
-  if (string_.includes("\n")) {
-    const escaped = string_
-      .replaceAll("\\", "\\\\")
-      .replaceAll('"', '\\"')
-      .replaceAll("\n", "\\n");
-    return `"${escaped}"`;
-  }
-
-  return `'${string_.replaceAll("'", "''")}'`;
+  // Prefer double quotes (Prettier's YAML default) so enrich/finalise rewrites
+  // don't turn authored `created_at: "…"` into single-quoted scalars that fail
+  // consumer `prettier --check` (A-1308).
+  const escaped = string_
+    .replaceAll("\\", "\\\\")
+    .replaceAll('"', '\\"')
+    .replaceAll("\n", "\\n");
+  return `"${escaped}"`;
 }
 
 function serialiseScalar(value: FrontmatterValue | undefined): string {
