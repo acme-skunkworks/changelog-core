@@ -136,10 +136,24 @@ describe("stringifyFrontmatter — round-trips", () => {
       flagish: "true",
       numish: "42",
     });
+    // Prefer double quotes (Prettier's YAML default) — A-1308.
+    expect(out).toContain('created_at: "2026-06-25T00:00:00Z"');
+    expect(out).toContain('flagish: "true"');
+    expect(out).toContain('numish: "42"');
+    expect(out).not.toMatch(/created_at: '/);
     const back = parseFrontmatter(out).data;
     expect(back.created_at).toBe("2026-06-25T00:00:00Z");
     expect(back.flagish).toBe("true");
     expect(back.numish).toBe("42");
+  });
+
+  it("double-quotes scalars that contain apostrophes and quotes", () => {
+    // `: ` forces quoting; apostrophe + interior `"` exercise the double-quote
+    // escape path that replaced YAML single-quote (`''`) escaping (A-1308).
+    const data = { title: 'Fix: it\'s "done"' };
+    const out = stringifyFrontmatter("body\n", data);
+    expect(out).toContain('title: "Fix: it\'s \\"done\\""');
+    expect(parseFrontmatter(out).data.title).toBe('Fix: it\'s "done"');
   });
 
   it("round-trips inline arrays as block arrays without losing items", () => {
