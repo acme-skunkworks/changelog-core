@@ -208,13 +208,13 @@ The PR event fixture lives at `.github/act-events/pull_request.json` and sets `p
 
 Scripts:
 
-| File                                    | Replaces                                                                            | Tests                                                                                                                 |
-| --------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `scripts/ensure-yamllint.sh`            | `ci.yml` yamllint step (now the reusable `lint` caller's yaml lane)                 | `tests/ensure-yamllint.bats` (install / already-installed branches)                                                   |
-| `scripts/ensure-actionlint.sh`          | `ci.yml` actionlint step (now the reusable `lint` caller's yaml lane)               | `tests/ensure-actionlint.bats` (cache-hit / cache-miss branches)                                                      |
-| `scripts/ensure-bats.sh`                | `ci.yml` bats install step (now the reusable `build-test` caller)                   | `tests/ensure-bats.bats` (cache hit/miss, version override, off-PATH cache, substring guard, GITHUB_PATH propagation) |
-| `scripts/publish-via-raw-npm.sh`        | (reference) npm publish step — now inlined in the reusable release workflow         | `tests/publish-via-raw-npm.bats` (idempotency, npm-view probing, error handling)                                      |
-| `scripts/publish-to-github-packages.sh` | (reference) GH Packages publish step — now inlined in the reusable release workflow | `tests/publish-to-github-packages.bats` (registry hard-code, idempotency)                                             |
+| File                                    | Replaces                                                                            | Tests                                                                                                                   |
+| --------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `scripts/ensure-yamllint.sh`            | `ci.yml` yamllint step (now the reusable `lint` caller's yaml lane)                 | `tests/ensure-yamllint.bats` (install / already-installed branches)                                                     |
+| `scripts/ensure-actionlint.sh`          | `ci.yml` actionlint step (now the reusable `lint` caller's yaml lane)               | `tests/ensure-actionlint.bats` (cache-hit / cache-miss branches)                                                        |
+| `scripts/ensure-bats.sh`                | `ci.yml` bats install step (now the reusable `build-test` caller)                   | `tests/ensure-bats.bats` (cache hit/miss, version override, off-PATH cache, substring guard, `GITHUB_PATH` propagation) |
+| `scripts/publish-via-raw-npm.sh`        | (reference) npm publish step — now inlined in the reusable release workflow         | `tests/publish-via-raw-npm.bats` (idempotency, npm-view probing, error handling)                                        |
+| `scripts/publish-to-github-packages.sh` | (reference) GH Packages publish step — now inlined in the reusable release workflow | `tests/publish-to-github-packages.bats` (registry hard-code, idempotency)                                               |
 
 The changelog `validate` / `enrich` / `finalise` / `add-links` / `check-completeness` logic that these tables once listed as `infrastructure/scripts/*-changelog.ts` now lives in `src/` as the `changelog-core` CLI (`src/commands/**`, `src/lib/**`), unit-tested by vitest in the repo-root `tests/`.
 
