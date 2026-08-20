@@ -9,13 +9,13 @@
     "enrich",
     "finalise"
   ],
-  "homepage": "https://github.com/acme-skunkworks/changelog-core#readme",
+  "homepage": "https://github.com/rheged-studio/changelog-core#readme",
   "bugs": {
-    "url": "https://github.com/acme-skunkworks/changelog-core/issues"
+    "url": "https://github.com/rheged-studio/changelog-core/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/acme-skunkworks/changelog-core.git"
+    "url": "git+https://github.com/rheged-studio/changelog-core.git"
   },
   "license": "MIT",
   "author": {
