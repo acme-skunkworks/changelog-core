@@ -1,5 +1,5 @@
 /**
- * Public API for @acme-studio/changelog-core.
+ * Public API for @rheged-studio/changelog-core.
  *
  * Library helpers and command pure functions — the CLI lives in `cli.ts`.
  */
