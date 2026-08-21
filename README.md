@@ -1,4 +1,4 @@
-# @acme-skunkworks/changelog-core
+# @rheged-studio/changelog-core
 
 Shared **changelog contract** and dual-runtime **CLI** for Rheged Studio —
 validate, enrich, and finalise dated `changelog/` entries from CI **and** local
@@ -10,7 +10,7 @@ Zero runtime dependencies (Node built-ins only). Node 22+.
 ## Install
 
 ```bash
-pnpm add -D @acme-skunkworks/changelog-core
+pnpm add -D @rheged-studio/changelog-core
 ```
 
 ## Config
@@ -58,7 +58,7 @@ pnpm changelog:finalise
 
 The frontmatter schema and field-ownership rules live in
 [`changelog-contract.md`](changelog-contract.md) (also importable as
-`@acme-skunkworks/changelog-core/contract`).
+`@rheged-studio/changelog-core/contract`).
 
 `merge_strategy` is **not** part of the contract (A-802). Existing entries that
 still carry the key validate fine — unknown keys are ignored.
@@ -71,7 +71,7 @@ import {
   enrichFrontmatter,
   parseFrontmatter,
   loadConfig,
-} from "@acme-skunkworks/changelog-core";
+} from "@rheged-studio/changelog-core";
 ```
 
 See `src/index.ts` for the full public surface (frontmatter, config, enrich,

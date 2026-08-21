@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Bin entry for @acme-skunkworks/changelog-core — parse the subcommand and
+// Bin entry for @rheged-studio/changelog-core — parse the subcommand and
 // dispatch to the matching command main. Global `--config <path>` (before or
 // after the subcommand) is mapped to CHANGELOG_CONFIG so loadConfig() picks it
 // up without each command re-parsing the flag.
