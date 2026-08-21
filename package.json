@@ -1,6 +1,6 @@
 {
   "name": "@rheged-studio/changelog-core",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Shared changelog contract and dual-runtime CLI for Rheged Studio — validate, enrich, and finalise dated changelog entries.",
   "keywords": [
     "changelog",
